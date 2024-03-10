@@ -1,75 +1,102 @@
-from typing import Iterable
-from player import Player
-import pygame
-from random import choice
-from pygame.sprite import AbstractGroup 
+import pygame 
 from settings import *
 from tile import Tile
+from player import Player
 from debug import debug
 from support import *
-  # Import moved here
-
-class YSortCameraGroup(pygame.sprite.Group):
-    def __init__(self):
-        super().__init__()
-        self.display_surface = pygame.display.get_surface()
-        self.half_width = self.display_surface.get_size()[0] // 2
-        self.half_height = self.display_surface.get_size()[1] // 2
-        self.offset = pygame.math.Vector2()
-
-        #creating the floor
-        self.floor_surface = pygame.image.load('MLHGW_PyGame_Zelda/graphics/tilemap/ground.png').convert()
-        self.floor_rect= self.floor_surface.get_rect(topleft = (0,0))
-
-    def custom_draw(self, player):
-        self.offset.x = player.rect.centerx - self.half_width
-        self.offset.y = player.rect.centery - self.half_height
-
-        #drwing the floor
-        floor_offset_pos = self.floor_rect.topleft - self.offset
-        self.display_surface.blit(self.floor_surface,floor_offset_pos)
-
-        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
-            offset_rect = sprite.rect.move(-self.offset.x, -self.offset.y)
-            self.display_surface.blit(sprite.image, offset_rect)
+from random import choice
+from weapon import Weapon
+from ui import UI
 
 class Level:
-    def __init__(self):
-        self.display_surface = pygame.display.get_surface()
-        self.visible_sprites = YSortCameraGroup()
-        self.obstacle_sprites = pygame.sprite.Group()
-        self.create_map()
+	def __init__(self):
 
-    def create_map(self):
-        layout= {
-            'boundary': import_csv_layout('MLHGW_PyGame_Zelda/map/map_FloorBlocks.csv'),
-            'grass' : import_csv_layout('MLHGW_PyGame_Zelda/map/map_Grass.csv'),
-            'object': import_csv_layout('MLHGW_PyGame_Zelda/map/map_LargeObjects.csv'),
-        }
-        graphics ={
-            'grass': import_folder('MLHGW_PyGame_Zelda/graphics/grass'),
-            'objects':import_folder('MLHGW_PyGame_Zelda/graphics/objects')
-        }
-        for style, layout in layout.items():
-            for row_index, row in enumerate(layout):
-                for col_index, col in enumerate(row): 
-                    if col != '-1':  
-                        x= col_index * TILESIZE
-                        y = row_index * TILESIZE
-                        if style == 'boundary':
-                            Tile((x,y),[ self.obstacle_sprites],'invisible')
-                        if style == 'grass':
-                            random_grass_image = choice(graphics['grass'])
-                            Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'grass',random_grass_image)
-                        if style == 'object':
-                            if int(col) < len(graphics['objects']):
-                                surf = graphics['objects'][int(col)]
-                                Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'object',surf)
+		# get the display surface 
+		self.display_surface = pygame.display.get_surface()
 
-        # Player instantiation moved outside create_map method
-        self.player = Player((400, 300), [self.visible_sprites], self.obstacle_sprites)
+		# sprite group setup
+		self.visible_sprites = YSortCameraGroup()
+		self.obstacle_sprites = pygame.sprite.Group()
 
-    
-    def run(self):
-        self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
+		# attack sprites
+		self.current_attack = None
+
+		# sprite setup
+		self.create_map()
+
+		# user interface 
+		self.ui = UI()
+
+	def create_map(self):
+		layouts = {
+			'boundary': import_csv_layout('MLHGW_PyGame_Zelda/map/map_FloorBlocks.csv'),
+			'grass': import_csv_layout('MLHGW_PyGame_Zelda/map/map_Grass.csv'),
+			'object': import_csv_layout('MLHGW_PyGame_Zelda/map/map_Objects.csv'),
+		}
+		graphics = {
+			'grass': import_folder('MLHGW_PyGame_Zelda/graphics/Grass'),
+			'objects': import_folder('MLHGW_PyGame_Zelda/graphics/objects')
+		}
+
+		for style,layout in layouts.items():
+			for row_index,row in enumerate(layout):
+				for col_index, col in enumerate(row):
+					if col != '-1':
+						x = col_index * TILESIZE
+						y = row_index * TILESIZE
+						if style == 'boundary':
+							Tile((x,y),[self.obstacle_sprites],'invisible')
+						if style == 'grass':
+							random_grass_image = choice(graphics['grass'])
+							Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'grass',random_grass_image)
+
+						if style == 'object':
+							surf = graphics['objects'][int(col)]
+							Tile((x,y),[self.visible_sprites,self.obstacle_sprites],'object',surf)
+
+		self.player = Player((2000,1430),[self.visible_sprites],self.obstacle_sprites,self.create_attack,self.destroy_attack)
+	
+	def create_attack(self):
+		
+		self.current_attack = Weapon(self.player,[self.visible_sprites])
+
+	def destroy_attack(self):
+		if self.current_attack:
+			self.current_attack.kill()
+		self.current_attack = None
+
+	def run(self):
+		# update and draw the game
+		self.visible_sprites.custom_draw(self.player)
+		self.visible_sprites.update()
+		self.ui.display(self.player)
+
+
+class YSortCameraGroup(pygame.sprite.Group):
+	def __init__(self):
+
+		# general setup 
+		super().__init__()
+		self.display_surface = pygame.display.get_surface()
+		self.half_width = self.display_surface.get_size()[0] // 2
+		self.half_height = self.display_surface.get_size()[1] // 2
+		self.offset = pygame.math.Vector2()
+
+		# creating the floor
+		self.floor_surf = pygame.image.load('MLHGW_PyGame_Zelda/graphics/tilemap/ground.png').convert()
+		self.floor_rect = self.floor_surf.get_rect(topleft = (0,0))
+
+	def custom_draw(self,player):
+
+		# getting the offset 
+		self.offset.x = player.rect.centerx - self.half_width
+		self.offset.y = player.rect.centery - self.half_height
+
+		# drawing the floor
+		floor_offset_pos = self.floor_rect.topleft - self.offset
+		self.display_surface.blit(self.floor_surf,floor_offset_pos)
+
+		# for sprite in self.sprites():
+		for sprite in sorted(self.sprites(),key = lambda sprite: sprite.rect.centery):
+			offset_pos = sprite.rect.topleft - self.offset
+			self.display_surface.blit(sprite.image,offset_pos)
