@@ -18,12 +18,13 @@ class UI:
 			path = weapon['graphic']
 			weapon = pygame.image.load(path).convert_alpha()
 			self.weapon_graphics.append(weapon)
+
 		# convert magic dictionary
 		self.magic_graphics = []
 		for magic in magic_data.values():
-			path = magic['graphic']
 			magic = pygame.image.load(magic['graphic']).convert_alpha()
 			self.magic_graphics.append(magic)
+
 
 	def show_bar(self,current,max_amount,bg_rect,color):
 		# draw bg 
@@ -80,4 +81,3 @@ class UI:
 
 		self.weapon_overlay(player.weapon_index,not player.can_switch_weapon)
 		self.magic_overlay(player.magic_index,not player.can_switch_magic)
-		# self.selection_box(80,635) # magic
