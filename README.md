@@ -65,7 +65,7 @@ Run the main.py file provided in: MLHGW_PYGAME_ZELDA/code/main.py to launch the 
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@GhoshAditi](https://github.com/GhoshAditi) - Idea & Initial work
+- [@GhoshAditi](https://github.com/GhoshAditi) - Idea & Initial work , Project Admin
 - [@rishicds](https://github.com/rishicds) - Contributor to the project
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
