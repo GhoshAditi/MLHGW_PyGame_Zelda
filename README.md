@@ -3,7 +3,7 @@
  <img width=200px height=200px src="https://i.imgur.com/UrU3pF4.png" alt="Project logo"></a>
 </p>
 
-<h3 align="center">Zelda DarkSouls</h3>
+<h3 align="center">MLHGW_PYGAME_ZELDA</h3>
 
 <div align="center">
 
@@ -29,7 +29,7 @@
 
 ## 🧐 About <a name = "about"></a>
 
-Explore name, a fantastic world full of surprises and horrors. Play as El, the protagonist of our narrative, as he conquers all the comes across his path in this new Soulslike!
+Explore Eldrea , a fantastic world full of surprises and horrors. Play as Lance, the protagonist of our narrative, as he conquers all that comes across his path in this new Soulslike!
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -59,8 +59,6 @@ Step 2:
 Run the main.py file provided in: MLHGW_PYGAME_ZELDA/code/main.py to launch the game directly.
 ```
 
-video to be included for running game
-
 ## ⛏️ Built Using <a name = "built_using"></a>
 
 - [Python](https://www.python.org/) 
@@ -74,4 +72,4 @@ video to be included for running game
 
 - Inspiration - [DarkSouls](https://en.bandainamcoent.eu/dark-souls/dark-souls) ,
                 [BreathOfTheWild](https://zelda.nintendo.com/breath-of-the-wild/)
-- References - need to be written, mainly copyright and license 
+
